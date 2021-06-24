@@ -51,12 +51,20 @@
         </section>
         <section class="row data mt-5">
           <template v-for="(value, name) in weather">
-            <div
+            <section
+              class="col-12 mb-5"
               v-if="!weatherKeysToExclude.includes(name)"
-              :key="name"
-              class="mb-5 border-warning border-bottom">
-              <h2>{{ name }}</h2>
-            </div>
+              :key="name">
+              <div
+                class="border-warning border-bottom title mb-3">
+                <h2>{{ weatherKeys[name].value }}</h2>
+              </div>
+              <div class="content">
+                <p>
+                  {{ weatherKeys[name].content(weather[weatherKeys[name].model][dateActive]) }}
+                </p>
+              </div>
+            </section>
           </template>
           <div></div>
         </section>
@@ -85,6 +93,34 @@ export default {
       showSuggestions: false,
       dateActive: 0,
       weatherKeysToExclude: ['units', 'city', 'warning', 'ts'],
+      weatherKeys: {
+        'temp-surface': {
+          value: 'Température',
+          model: 'temp-surface',
+          content(ts) {
+            const celsius = ts - 273.15;
+            return `Température de l'air ${Math.round(celsius)}°`;
+          },
+        },
+        'pressure-surface': {
+          value: 'Pression de l\'air',
+          model: 'pressure-surface',
+          content(ts) {
+            const hpa = ts / 100;
+            return `Pression de l'air ${Math.round(hpa)} en HPA`;
+          },
+        },
+        'wind_u-surface': {
+          value: 'Vitesse du vent (Ouest -> Est)',
+          model: 'wind_u-surface',
+          content() {},
+        },
+        'wind_v-surface': {
+          value: 'Vitesse du vent (Sud -> Nord)',
+          model: 'wind_v-surface',
+          content() {},
+        },
+      },
       showLoader: false,
       suggestions: [],
       weather: null,
