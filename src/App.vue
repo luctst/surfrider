@@ -113,12 +113,42 @@ export default {
         'wind_u-surface': {
           value: 'Vitesse du vent (Ouest -> Est)',
           model: 'wind_u-surface',
-          content() {},
+          content(ts) {
+            if (!ts) return '';
+            return `Vitesse du vent ${Math.round(ts * 100) / 100}km/h`;
+          },
         },
         'wind_v-surface': {
           value: 'Vitesse du vent (Sud -> Nord)',
           model: 'wind_v-surface',
-          content() {},
+          content(ts) {
+            if (!ts) return '';
+            return `Vitesse du vent ${Math.round(ts * 100) / 100}km/h`;
+          },
+        },
+        'waves_direction-surface': {
+          value: 'Vagues - direction',
+          model: 'waves_direction-surface',
+          content(ts) {
+            if (!ts) return '';
+            return `La direction d'ou les vagues viennent ${Math.round(ts * 100) / 100}deg`;
+          },
+        },
+        'waves_height-surface': {
+          value: 'Vagues - hauteur',
+          model: 'waves_height-surface',
+          content(ts) {
+            if (!ts) return '';
+            return `Hauteur des vagues ${Math.round(ts * 100) / 100}m`;
+          },
+        },
+        'waves_period-surface': {
+          value: 'Vagues - période',
+          model: 'waves_period-surface',
+          content(ts) {
+            if (!ts) return '';
+            return `l'intervalle de temps entre l'arrivée de crêtes consécutives à un point stationnaire ${Math.round(ts * 100) / 100}s`;
+          },
         },
       },
       showLoader: false,
@@ -151,14 +181,26 @@ export default {
       this.city = cityData.place_name;
 
       try {
-        const { data } = await axios.post('https://api.windy.com/api/point-forecast/v2', {
+        const mockup = {
           lat: this.dataToPost.lat,
           lon: this.dataToPost.long,
+          key: process.env.VUE_APP_KEY,
+        };
+
+        const gfs = await axios.post('https://api.windy.com/api/point-forecast/v2', {
+          ...mockup,
           parameters: ['temp', 'pressure', 'wind'],
           model: 'gfs',
-          key: process.env.VUE_APP_KEY,
         });
-        this.weather = data;
+        const gfsWave = await axios.post('https://api.windy.com/api/point-forecast/v2', {
+          ...mockup,
+          parameters: ['waves'],
+          model: 'gfsWave',
+        });
+        this.weather = {
+          ...gfs.data,
+          ...gfsWave.data,
+        };
         this.weather.city = this.city;
         this.showLoader = false;
       } catch (error) {
