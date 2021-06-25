@@ -1,4 +1,5 @@
 # surfrider
+[![Upload Vue App to S3](https://github.com/luctst/surfrider/actions/workflows/s3.yml/badge.svg)](https://github.com/luctst/surfrider/actions/workflows/s3.yml)
 
 ## Project setup
 ```
